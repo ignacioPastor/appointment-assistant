@@ -1,11 +1,20 @@
 const builder = require('botbuilder');
 const restify = require('restify');
 
-const connector = new builder.ConsoleConnector().listen();
+// const connector = new builder.ConsoleConnector().listen();
+
+const server = restify.createServer();
+server.listen(process.env.port || process.env.PORT || 3978, () => {
+  console.log(`${server.name} listening to ${server.url}`);
+})
+
+
+const connector = new builder.ChatConnector();
 const bot = new builder.UniversalBot(connector, (session) => {
   session.send(`Hey there! I'm a virtual assistant. I can help you book an medical appointment with us. Please provide answers to the following questions`);
   session.beginDialog('setAppointment');
 });
+server.post('/api/messages', connector.listen());
 
 bot.dialog('setAppointment', [
   (session, args, next) => {
